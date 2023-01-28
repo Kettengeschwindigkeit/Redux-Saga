@@ -1,84 +1,30 @@
-import { takeEvery, put, call } from "@redux-saga/core/effects";
-import { GET_LATEST_NEWS } from "../constants";
-import { getLatestNews } from "../../api";
-import { setLatestNews } from "../actions/actionCreator";
+import { takeEvery, put, call, fork } from "@redux-saga/core/effects";
+import { GET_NEWS } from "../constants";
+import { getLatestNews, getPopularNews } from "../../api";
+import { setLatestNews, setPopularNews } from "../actions/actionCreator";
 
 export function* handleLatestNews() {
-    const { hits } = yield call(getLatestNews, 'react');
+    const { hits } = yield call(getLatestNews, "react");
     yield put(setLatestNews(hits));
 }
 
+export function* handlePopularNews() {
+    const { hits } = yield call(getPopularNews);
+    yield put(setPopularNews(hits));
+}
+
+export function* handleNews() {
+    // yield call(handleLatestNews);
+    // yield call(handlePopularNews);
+    yield fork(handleLatestNews);
+    yield fork(handlePopularNews);
+}
+
 export function* watchClickSaga() {
-    yield takeEvery(GET_LATEST_NEWS, handleLatestNews);
+    yield takeEvery(GET_NEWS, handleNews);
 }
 
 export default function* rootSaga() {
     console.log('Hello world!');
     yield watchClickSaga();
 }
-
-// ===========================================================================================================================================================================================================
-
-// import { take, takeEvery, takeLatest, takeLeading, select } from "@redux-saga/core/effects";
-// import { INCREASE_COUNT, DECREASE_COUNT } from "../constants";
-
-// const delay = (time) => new Promise((resolve, reject) => {
-//     setTimeout(resolve, time * 1000);
-// })
-
-// export function* workerSaga() {
-//     const count = yield select(({ counter }) => counter.count);
-//     yield delay(2);
-//     console.log(`request ${count}`);
-// }
-
-// export function* watchClickSaga() {
-//     yield takeLatest(INCREASE_COUNT, workerSaga);
-//     yield takeLeading(INCREASE_COUNT, workerSaga);
-// }
-
-// export default function* rootSaga() {
-//     console.log('Hello world!');
-//     yield watchClickSaga();
-// }
-
-// ===========================================================================================================================================================================================================
-
-// import { take, takeEvery } from "@redux-saga/core/effects";
-// import { INCREASE_COUNT, DECREASE_COUNT } from "../constants";
-
-// export function* workerSaga() {
-//     console.log('request 2');
-//     yield;
-// }
-
-// export function* watchClickSaga() {
-//     yield take(INCREASE_COUNT);
-//     console.log('request 1');
-//     yield takeEvery(DECREASE_COUNT, workerSaga);
-// }
-
-// export default function* rootSaga() {
-//     console.log('Hello world!');
-//     yield watchClickSaga();
-// }
-
-// ===========================================================================================================================================================================================================
-
-// import { take, takeEvery } from "@redux-saga/core/effects";
-// import { INCREASE_COUNT, DECREASE_COUNT } from "../constants";
-
-// export function* workerSaga() {
-
-// }
-
-// export function* watchClickSaga() {
-//     yield take(INCREASE_COUNT);
-//     console.log('request 1');
-//     yield takeEvery(DECREASE_COUNT, () => console.log('request 2'));
-// }
-
-// export default function* rootSaga() {
-//     console.log('Hello world!');
-//     yield watchClickSaga();
-// }
